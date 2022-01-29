@@ -145,33 +145,42 @@ function HomePage() {
               padding: "16px",
               backgroundColor: appConfig.theme.colors.neutrals[800],
               border: "1px solid",
-              borderColor: appConfig.theme.colors.neutrals[999],
+              borderColor: appConfig.theme.colors.neutrals[800],
               borderRadius: "10px",
               flex: 1,
               minHeight: "240px",
             }}
           >
             {githubUser && (
-              <>
-                <Image
-                  styleSheet={{
-                    borderRadius: "50%",
-                    marginBottom: "16px",
-                  }}
-                  src={`https://github.com/${username}.png`}
-                />
-                <Text
-                  variant="body4"
-                  styleSheet={{
-                    color: appConfig.theme.colors.neutrals[200],
-                    backgroundColor: appConfig.theme.colors.neutrals[900],
-                    padding: "3px 10px",
-                    borderRadius: "1000px",
-                  }}
-                >
-                  {githubUser.name}
-                </Text>
-              </>
+              <Image
+                styleSheet={{
+                  borderRadius: "50%",
+                  marginBottom: "16px",
+                }}
+                src={`https://github.com/${username}.png`}
+              />
+            )}
+            {githubUser?.name && (
+              <Text
+                variant="body4"
+                styleSheet={{
+                  color: appConfig.theme.colors.neutrals[100],
+                  padding: "3px 10px",
+                }}
+              >
+                {githubUser.name}
+              </Text>
+            )}
+            {githubUser?.login && (
+              <Text
+                variant="body4"
+                styleSheet={{
+                  color: appConfig.theme.colors.neutrals[300],
+                  padding: "3px 10px",
+                }}
+              >
+                {githubUser.login}
+              </Text>
             )}
           </Box>
           {/* Photo Area */}
