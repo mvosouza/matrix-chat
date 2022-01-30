@@ -1,34 +1,37 @@
 import { Box, Text, TextField, Image, Button } from "@skynexui/components";
 import React from "react";
 import appConfig from "../config.json";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseClient = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_BASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 export default function ChatPage() {
-  // Sua lógica vai aqui
-
-  // Usuário
-  // - Usuário digita no campo textarear
-  // - Aperta enter para enviar
-  // - Tem que adicionar o text na listagem
-  //
-
-  // Dev
-  // [X] Campo criado
-  // [X] Vamos usar o Onchange usa o useState (ter if pra caso seja enter para limpar a variável)
-  // [ ] Lista de mensagens
-
-  // ./Sua lógica vai aqui
   const [message, setMessage] = React.useState("");
   const [messageList, setMessageList] = React.useState([]);
 
-  const handleNewMessage = (newMessage) => {
-    setMessageList([
+  React.useEffect(() => {
+    const getMessagesFromSupabase = async () => {
+      const response = await supabaseClient
+        .from("messages")
+        .select("*")
+        .order("created_at", { ascending: false });
+      setMessageList(response.data);
+    };
+
+    getMessagesFromSupabase();
+  }, []);
+
+  const handleNewMessage = async (newMessage) => {
+    const { data: newMessages } = await supabaseClient.from("messages").insert([
       {
-        id: newMessage.length,
         from: "mvosouza",
         text: newMessage,
       },
-      ...messageList,
     ]);
+    setMessageList([...newMessages, ...messageList]);
     setMessage("");
   };
 
@@ -36,10 +39,10 @@ export default function ChatPage() {
     setMessage(e.target.value);
   };
 
-  const handleMessageKey = (e) => {
+  const handleMessageKey = async (e) => {
     if (e.key == "Enter") {
       e.preventDefault();
-      handleNewMessage(message);
+      await handleNewMessage(message);
     }
   };
 
@@ -153,7 +156,7 @@ function MessageList({ messages }) {
         marginBottom: "16px",
       }}
     >
-      {messages.map(({ id, from, text }) => (
+      {messages.map(({ id, from, text, created_at }) => (
         <Text
           key={id}
           tag="li"
@@ -170,7 +173,7 @@ function MessageList({ messages }) {
             styleSheet={{
               marginBottom: "8px",
               display: "flex",
-              alignItems: "center",
+              alignItems: "baseline",
             }}
           >
             <Image
@@ -192,7 +195,7 @@ function MessageList({ messages }) {
               }}
               tag="span"
             >
-              {new Date().toLocaleDateString()}
+              {new Date(created_at).toLocaleDateString()}
             </Text>
           </Box>
           {text}
