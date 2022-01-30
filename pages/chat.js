@@ -46,6 +46,12 @@ export default function ChatPage() {
     }
   };
 
+  const handleMessageDelete = async (e) => {
+    const messageId = e.currentTarget.id;
+    await supabaseClient.from("messages").delete().match({ id: messageId });
+    setMessageList([...messageList.filter(({ id }) => id !== messageId)]);
+  };
+
   return (
     <Box
       styleSheet={{
@@ -87,7 +93,10 @@ export default function ChatPage() {
             padding: "16px",
           }}
         >
-          <MessageList messages={messageList} />
+          <MessageList
+            messages={messageList}
+            onDeleteMessage={handleMessageDelete}
+          />
           <Box
             as="form"
             styleSheet={{
@@ -143,7 +152,7 @@ function Header() {
   );
 }
 
-function MessageList({ messages }) {
+function MessageList({ messages, onDeleteMessage }) {
   return (
     <Box
       tag="ul"
@@ -173,30 +182,53 @@ function MessageList({ messages }) {
             styleSheet={{
               marginBottom: "8px",
               display: "flex",
-              alignItems: "baseline",
+              justifyContent: "space-between",
             }}
           >
-            <Image
+            <Box
               styleSheet={{
-                width: "20px",
-                height: "20px",
-                borderRadius: "50%",
-                display: "inline-block",
-                marginRight: "8px",
+                marginBottom: "8px",
+                display: "flex",
+                alignItems: "baseline",
               }}
-              src={`https://github.com/${from}.png`}
-            />
-            <Text tag="strong">{from}</Text>
-            <Text
-              styleSheet={{
-                fontSize: "10px",
-                marginLeft: "8px",
-                color: appConfig.theme.colors.neutrals[300],
-              }}
-              tag="span"
             >
-              {new Date(created_at).toLocaleDateString()}
-            </Text>
+              <Image
+                styleSheet={{
+                  width: "20px",
+                  height: "20px",
+                  borderRadius: "50%",
+                  display: "inline-block",
+                  marginRight: "8px",
+                }}
+                src={`https://github.com/${from}.png`}
+              />
+              <Text tag="strong">{from}</Text>
+              <Text
+                styleSheet={{
+                  fontSize: "10px",
+                  marginLeft: "8px",
+                  color: appConfig.theme.colors.neutrals[300],
+                }}
+                tag="span"
+              >
+                {new Date(created_at).toLocaleDateString()}
+              </Text>
+            </Box>
+            <Button
+              id={id}
+              colorVariant="negative"
+              label="x"
+              size="xs"
+              variant="tertiary"
+              styleSheet={{
+                width: "6px",
+                height: "6px",
+                padding: "6px",
+                borderRadius: "50%",
+                color: appConfig.theme.colors.neutrals["000"],
+              }}
+              onClick={onDeleteMessage}
+            />
           </Box>
           {text}
         </Text>
