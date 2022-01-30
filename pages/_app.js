@@ -7,11 +7,9 @@ function GlobalStyle() {
         box-sizing: border-box;
         list-style: none;
       }
-
       body {
         font-family: "Open Sans", sans-serif;
       }
-
       /* App fit Height */
       html,
       body,
@@ -20,15 +18,12 @@ function GlobalStyle() {
         display: flex;
         flex: 1;
       }
-
       #__next {
         flex: 1;
       }
-
       #__next > * {
         flex: 1;
       }
-
       /* ./App fit Height */
     `}</style>
   );

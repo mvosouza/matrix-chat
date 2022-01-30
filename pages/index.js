@@ -24,13 +24,21 @@ function HomePage() {
   const router = useRouter();
 
   const getGithubUserJsonByUsername = async (githubUsername) => {
-    const response = await fetch(
-      `https://api.github.com/users/${githubUsername}`
-    );
+    try {
+      if (!githubUsername) {
+        throw new Error("Username not provided!");
+      }
 
-    if (response.status == 200) {
-      return await response.json();
-    } else {
+      const response = await fetch(
+        `https://api.github.com/users/${githubUsername}`
+      );
+
+      if (response.ok) {
+        return await response.json();
+      } else {
+        return null;
+      }
+    } catch (err) {
       return null;
     }
   };
@@ -57,8 +65,7 @@ function HomePage() {
           alignItems: "center",
           justifyContent: "center",
           backgroundColor: appConfig.theme.colors.primary[800],
-          backgroundImage:
-            "url(https://virtualbackgrounds.site/wp-content/uploads/2020/08/the-matrix-digital-rain.jpg)",
+          backgroundImage: `url(${appConfig.background.matrix})`,
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundBlendMode: "multiply",
@@ -151,13 +158,13 @@ function HomePage() {
               minHeight: "240px",
             }}
           >
-            {githubUser && (
+            {githubUser?.login && (
               <Image
                 styleSheet={{
                   borderRadius: "50%",
                   marginBottom: "16px",
                 }}
-                src={`https://github.com/${username}.png`}
+                src={`https://github.com/${githubUser.login}.png`}
               />
             )}
             {githubUser?.name && (
