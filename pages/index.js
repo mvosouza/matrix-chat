@@ -54,7 +54,7 @@ function HomePage() {
     // changing the route with javascript api
     // window.location.href = "/chat";
     // Nextjs route hook
-    router.push("/chat");
+    router.push(`/chat?username=${username}`);
   };
 
   return (

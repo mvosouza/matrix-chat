@@ -2,15 +2,29 @@ import { Box, Text, TextField, Image, Button } from "@skynexui/components";
 import React from "react";
 import appConfig from "../config.json";
 import { createClient } from "@supabase/supabase-js";
+import { useRouter } from "next/router";
+import { ButtonSendSticker } from "../src/components/ButtonSendSticker";
 
 const supabaseClient = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_BASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
+const listeningMessagesInRealTime = (addMessage) => {
+  supabaseClient
+    .from("messages")
+    .on("INSERT", ({ new: newMessage }) => {
+      addMessage(newMessage);
+    })
+    .subscribe();
+};
+
 export default function ChatPage() {
   const [message, setMessage] = React.useState("");
   const [messageList, setMessageList] = React.useState([]);
+  const router = useRouter();
+
+  const { username } = router.query;
 
   React.useEffect(() => {
     const getMessagesFromSupabase = async () => {
@@ -22,16 +36,18 @@ export default function ChatPage() {
     };
 
     getMessagesFromSupabase();
+    listeningMessagesInRealTime((newMessage) => {
+      setMessageList((actualMessageList) => [newMessage, ...actualMessageList]);
+    });
   }, []);
 
   const handleNewMessage = async (newMessage) => {
-    const { data: newMessages } = await supabaseClient.from("messages").insert([
+    await supabaseClient.from("messages").insert([
       {
-        from: "mvosouza",
+        from: username,
         text: newMessage,
       },
     ]);
-    setMessageList([...newMessages, ...messageList]);
     setMessage("");
   };
 
@@ -120,6 +136,11 @@ export default function ChatPage() {
               value={message}
               onChange={handleMessageChange}
               onKeyPress={handleMessageKey}
+            />
+            <ButtonSendSticker
+              onStickerClick={async (sticker) => {
+                await handleNewMessage(`:sticker: ${sticker}`);
+              }}
             />
           </Box>
         </Box>
@@ -230,7 +251,14 @@ function MessageList({ messages, onDeleteMessage }) {
               onClick={onDeleteMessage}
             />
           </Box>
-          {text}
+          {text.startsWith(":sticker:") ? (
+            <Image
+              src={text.replace(":sticker:", "")}
+              styleSheet={{ height: "7em" }}
+            />
+          ) : (
+            text
+          )}
         </Text>
       ))}
     </Box>
