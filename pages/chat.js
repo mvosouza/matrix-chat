@@ -187,80 +187,98 @@ function MessageList({ messages, onDeleteMessage }) {
       }}
     >
       {messages.map(({ id, from, text, created_at }) => (
-        <Text
+        <Message
           key={id}
-          tag="li"
-          styleSheet={{
-            borderRadius: "5px",
-            padding: "6px",
-            marginBottom: "12px",
-            hover: {
-              backgroundColor: appConfig.theme.colors.neutrals[700],
-            },
-          }}
-        >
-          <Box
-            styleSheet={{
-              marginBottom: "8px",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <Box
-              styleSheet={{
-                marginBottom: "8px",
-                display: "flex",
-                alignItems: "baseline",
-              }}
-            >
-              <Image
-                styleSheet={{
-                  width: "20px",
-                  height: "20px",
-                  borderRadius: "50%",
-                  display: "inline-block",
-                  marginRight: "8px",
-                }}
-                src={`https://github.com/${from}.png`}
-              />
-              <Text tag="strong">{from}</Text>
-              <Text
-                styleSheet={{
-                  fontSize: "10px",
-                  marginLeft: "8px",
-                  color: appConfig.theme.colors.neutrals[300],
-                }}
-                tag="span"
-              >
-                {new Date(created_at).toLocaleDateString()}
-              </Text>
-            </Box>
-            <Button
-              id={id}
-              colorVariant="negative"
-              label="x"
-              size="xs"
-              variant="tertiary"
-              styleSheet={{
-                width: "6px",
-                height: "6px",
-                padding: "6px",
-                borderRadius: "50%",
-                color: appConfig.theme.colors.neutrals["000"],
-              }}
-              onClick={onDeleteMessage}
-            />
-          </Box>
-          {text.startsWith(":sticker:") ? (
-            <Image
-              src={text.replace(":sticker:", "")}
-              styleSheet={{ height: "7em" }}
-            />
-          ) : (
-            text
-          )}
-        </Text>
+          id={id}
+          from={from}
+          text={text}
+          created_at={created_at}
+          onDeleteMessage={onDeleteMessage}
+        />
       ))}
     </Box>
+  );
+}
+
+function Message({ id, from, text, created_at, onDeleteMessage }) {
+  const [isShown, setIsShown] = React.useState(false);
+
+  return (
+    <Text
+      tag="li"
+      styleSheet={{
+        borderRadius: "5px",
+        padding: "6px",
+        marginBottom: "12px",
+        hover: {
+          backgroundColor: appConfig.theme.colors.neutrals[700],
+        },
+      }}
+      onMouseEnter={() => setIsShown(true)}
+      onMouseLeave={() => setIsShown(false)}
+    >
+      <Box
+        styleSheet={{
+          marginBottom: "8px",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box
+          styleSheet={{
+            marginBottom: "8px",
+            display: "flex",
+            alignItems: "baseline",
+          }}
+        >
+          <Image
+            styleSheet={{
+              width: "20px",
+              height: "20px",
+              borderRadius: "50%",
+              display: "inline-block",
+              marginRight: "8px",
+            }}
+            src={`https://github.com/${from}.png`}
+          />
+          <Text tag="strong">{from}</Text>
+          <Text
+            styleSheet={{
+              fontSize: "10px",
+              marginLeft: "8px",
+              color: appConfig.theme.colors.neutrals[300],
+            }}
+            tag="span"
+          >
+            {new Date(created_at).toLocaleDateString()}
+          </Text>
+        </Box>
+        {isShown && (
+          <Button
+            id={id}
+            colorVariant="negative"
+            label="x"
+            size="xs"
+            variant="tertiary"
+            styleSheet={{
+              width: "6px",
+              height: "6px",
+              padding: "6px",
+              borderRadius: "50%",
+              color: appConfig.theme.colors.neutrals["000"],
+            }}
+            onClick={onDeleteMessage}
+          />
+        )}
+      </Box>
+      {text.startsWith(":sticker:") ? (
+        <Image
+          src={text.replace(":sticker:", "")}
+          styleSheet={{ height: "7em" }}
+        />
+      ) : (
+        text
+      )}
+    </Text>
   );
 }
